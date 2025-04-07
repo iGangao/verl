@@ -172,17 +172,18 @@ class vLLMRollout(BaseRollout):
         # rebuild vllm cache engine
         if vllm_version in ('0.3.1', '0.4.2', '0.5.4', '0.6.3') and self.config.free_cache_engine:
             self.inference_engine.init_cache_engine()
-
+        # @liugangao
         idx = prompts.batch['input_ids']  # (bs, prompt_length)
-        print("rollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::prompts.batch['input_ids']:\n\n", idx)
-        print("\n\nrollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::prompts.batch['input_ids']")
+        print("==rollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences==\n")
+        print("prompts.batch['input_ids']:\n", idx.shape, idx[0])
+        print("prompts.batch['input_ids']\n")
         # left-padded attention_mask
         attention_mask = prompts.batch['attention_mask']
-        print("rollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::prompts.batch['attention_mask']:\n\n", attention_mask)
-        print("\n\nrollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::prompts.batch['attention_mask']")
+        print("prompts.batch['attention_mask']:\n", attention_mask)
+        print("prompts.batch['attention_mask']\n")
         position_ids = prompts.batch['position_ids']
-        print("rollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::prompts.batch['position_ids']:\n\n", position_ids)
-        print("\n\nrollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::prompts.batch['position_ids']")
+        print("prompts.batch['position_ids']:\n", position_ids)
+        print("prompts.batch['position_ids']\n")
 
         # used to construct attention_mask
         eos_token_id = prompts.meta_info['eos_token_id']
@@ -190,8 +191,9 @@ class vLLMRollout(BaseRollout):
         batch_size = idx.size(0)
 
         non_tensor_batch = prompts.non_tensor_batch
-        print("rollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::prompts.non_tensor_batch:\n\n", non_tensor_batch)
-        print("\n\nrollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::prompts.non_tensor_batch")
+        # @liugangao
+        print("prompts.non_tensor_batch:\n\n", non_tensor_batch)
+        print("\nprompts.non_tensor_batch")
 
         if 'raw_prompt_ids' not in non_tensor_batch:
             non_tensor_batch['raw_prompt_ids'] = np.array(
@@ -238,9 +240,9 @@ class vLLMRollout(BaseRollout):
                 'temperature': self.config.val_kwargs.temperature,
                 'n': 1,  # if validate, already repeat in ray_trainer
             }
-
-        print("rollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::vllm_inputs:\n\n", vllm_inputs)
-        print("\n\nrollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::vllm_inputs")
+        # @liugangao
+        print("vllm_inputs:\n", vllm_inputs)
+        print("\nvllm_inputs")
 
         # users can customize different sampling_params at different run
         with self.update_sampling_params(**kwargs):
@@ -256,9 +258,9 @@ class vLLMRollout(BaseRollout):
             for output in outputs:
                 for sample_id in range(len(output.outputs)):
                     response.append(output.outputs[sample_id].token_ids)
-
-            print("rollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::response:\n\n", response)
-            print("\n\nrollout::vllm_rollout::vllm_rollout_spmd::vLLMRollout::generate_sequences::response")
+            # @liugangao
+            print("response:\n", response)
+            print("\nresponse")
 
             response = pad_2d_list_to_length(response, self.pad_token_id,
                                              max_length=self.config.response_length).to(idx.device)

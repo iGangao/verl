@@ -163,11 +163,13 @@ class RLHFDataset(Dataset):
         Note that we also return the raw_input_ids so that it can be combined with other chat template
         """
         row_dict: dict = self.dataframe[item]
-
+        # @liugangao
+        # print(f'verl::utils::dataset::rl_dataset::row_dict.keys: {row_dict.keys()}, "self.prompt_key": {self.prompt_key}')
         chat = row_dict.pop(self.prompt_key)
-
+        # print(f'verl::utils::dataset::rl_dataset::chat: {chat}')
+        chat = [{"role": "user", "content": chat}] if isinstance(chat, str) else chat
         prompt_with_chat_template = self.tokenizer.apply_chat_template(chat, add_generation_prompt=True, tokenize=False)
-
+        print(f'verl::utils::dataset::rl_dataset::prompt_with_chat_template: {prompt_with_chat_template}')
         is_multi_modal = self.image_key in row_dict
         if is_multi_modal:  # expand image token
             raw_prompt = prompt_with_chat_template.replace('<image>', '<|vision_start|><|image_pad|><|vision_end|>')
