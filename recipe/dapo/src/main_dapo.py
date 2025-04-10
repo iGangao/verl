@@ -131,6 +131,9 @@ class TaskRunner:
         # - for code related prompt, we send to a sandbox if there are test cases
         # - finally, we combine all the rewards together
         # - The reward type depends on the tag of the data
+        # @liugangao
+        '''
+        dapo_trainer.yaml::reward_model.enable=False
         if config.reward_model.enable:
             if config.reward_model.strategy == 'fsdp':
                 from verl.workers.fsdp_workers import RewardModelWorker
@@ -140,12 +143,15 @@ class TaskRunner:
                 raise NotImplementedError
             role_worker_mapping[Role.RewardModel] = ray.remote(RewardModelWorker)
             mapping[Role.RewardModel] = global_pool_id
-
+        '''
         # reference model
+        # @liugangao
+        '''
+        dapo_trainer.yaml::algorithm.use_kl_in_reward=False | dapo_trainer.yaml::actor_rollout_ref.actor.use_kl_loss=False # True for GRPO
         if config.algorithm.use_kl_in_reward or config.actor_rollout_ref.actor.use_kl_loss:
             role_worker_mapping[Role.RefPolicy] = ray.remote(ActorRolloutRefWorker)
             mapping[Role.RefPolicy] = global_pool_id
-
+        '''
         reward_manager_name = config.reward_model.get("reward_manager", "naive")
         if reward_manager_name == 'naive':
             from verl.workers.reward_manager import NaiveRewardManager
