@@ -259,6 +259,11 @@ class vLLMRollout(BaseRollout):
                 for sample_id in range(len(output.outputs)):
                     response.append(output.outputs[sample_id].token_ids)
             # @liugangao
+            # 1. match action
+            # actions = []
+            # for res in response:
+            #     actions.append(match_action(res))
+            #  match_action()
             print("response:\n", response)
             print("\nresponse")
 
