@@ -375,7 +375,8 @@ def compute_policy_loss(old_log_prob,
             the fraction of policy gradient loss being clipped when the advantage is negative
     """
     assert clip_ratio_c > 1.0, f"The lower bound of the clip_ratio_c for dual-clip PPO should be greater than 1.0, but get the value: {clip_ratio_c}."
-
+    # @liugangao
+    # \pi_\theta(a|s) / \pi_\theta_{old}(a|s)
     negative_approx_kl = log_prob - old_log_prob
     ratio = torch.exp(negative_approx_kl)
     ppo_kl = verl_F.masked_mean(-negative_approx_kl, response_mask)
